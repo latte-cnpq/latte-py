@@ -7,5 +7,5 @@ from rest_framework.response import Response
 
 
 class InstitutesViewSet(viewsets.ModelViewSet):
-    queryset = Institute.objects.all()
+    queryset = Institute.objects.all().order_by("id")
     serializer_class = InstituteSerializer

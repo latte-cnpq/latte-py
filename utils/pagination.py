@@ -8,7 +8,6 @@ class CustomPagination(pagination.PageNumberPagination):
         return Response(
             {
                 "next": self.page.next_page_number(),
-                "previous": self.page.previous_page_number(),
                 "count": self.page.paginator.count,
                 "total_pages": self.page.paginator.num_pages,
                 "results": data,
