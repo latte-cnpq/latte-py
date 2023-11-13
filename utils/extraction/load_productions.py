@@ -64,7 +64,7 @@ def get_published_articles(researcher, root):
                                 year=year,
                                 language=language,
                                 dissemination_medium=dissemination_medium,
-                                type="article",
+                                type=Production.ARTICLE,
                             )
 
                             autores = pub_article.findall("AUTORES")
@@ -131,7 +131,7 @@ def get_books_chapters(researcher, root):
                                     year=year,
                                     language=language,
                                     dissemination_medium=dissemination_medium,
-                                    type="chapter",
+                                    type=Production.CHAPTER,
                                 )
 
                                 autores = chapter.findall("AUTORES")
@@ -198,7 +198,7 @@ def get_books(researcher, root):
                                     year=year,
                                     language=language,
                                     dissemination_medium=dissemination_medium,
-                                    type="book",
+                                    type=Production.BOOK,
                                 )
 
                                 autores = book.findall("AUTORES")

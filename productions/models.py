@@ -3,10 +3,13 @@ from researcher.models import Researcher
 
 
 class Production(models.Model):
+    ARTICLE = 1
+    BOOK = 2
+    CHAPTER = 3
     TYPE_CHOICES = [
-        ("article", "Article"),
-        ("book", "Published Book"),
-        ("chapter", "Published Chapter"),
+        (ARTICLE, "Article"),
+        (BOOK, "Published Book"),
+        (CHAPTER, "Published Chapter"),
     ]
 
     researcher = models.ForeignKey(Researcher, on_delete=models.CASCADE)
@@ -16,7 +19,7 @@ class Production(models.Model):
     year = models.PositiveIntegerField()
     language = models.CharField(max_length=50)
     dissemination_medium = models.CharField(max_length=50)
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    type = models.PositiveIntegerField(choices=TYPE_CHOICES)
 
     def __str__(self):
         return self.title
