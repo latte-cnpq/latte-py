@@ -1,60 +1,36 @@
+# serializers.py
+
 from rest_framework import serializers
-from .models import CommonFields, Article, EventWork, PublishedBook, PublishedChapter
+from .models import Production, Article, PublishedBook, PublishedChapter
 
 
-class CommonFieldsSerializer(serializers.ModelSerializer):
+class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CommonFields
-        fields = (
-            "id",
-            "researcher",
-            "title",
-            "nature",
-            "year",
-            "language",
-            "dissemination_medium",
-        )
-
-
-# Serializer for Article model
-class ArticleSerializer(CommonFieldsSerializer):
-    class Meta(CommonFieldsSerializer.Meta):
         model = Article
-        fields = CommonFieldsSerializer.Meta.fields + (
-            "periodical_title",
-            "volume",
-            "pages",
-            "publication_location",
-            "homepage",
-        )
+        fields = "__all__"
 
 
-# Serializer for EventWork model
-class EventWorkSerializer(CommonFieldsSerializer):
-    class Meta(CommonFieldsSerializer.Meta):
-        model = EventWork
-        fields = CommonFieldsSerializer.Meta.fields + (
-            "event_name",
-            "event_city",
-            "pages",
-            "publisher_name",
-        )
-
-
-# Serializer for PublishedBook model
-class PublishedBookSerializer(CommonFieldsSerializer):
-    class Meta(CommonFieldsSerializer.Meta):
+class PublishedBookSerializer(serializers.ModelSerializer):
+    class Meta:
         model = PublishedBook
-        fields = CommonFieldsSerializer.Meta.fields + ("volume", "pages", "publisher")
+        fields = "__all__"
 
 
-# Serializer for PublishedChapter model
-class PublishedChapterSerializer(CommonFieldsSerializer):
-    class Meta(CommonFieldsSerializer.Meta):
+class PublishedChapterSerializer(serializers.ModelSerializer):
+    class Meta:
         model = PublishedChapter
-        fields = CommonFieldsSerializer.Meta.fields + (
-            "book_title",
-            "organizers",
-            "pages",
-            "publisher",
-        )
+        fields = "__all__"
+
+
+class ProductionSerializer(serializers.ModelSerializer):
+    article = ArticleSerializer(source="article_set", many=False, read_only=True)
+    published_book = PublishedBookSerializer(
+        source="publishedbook", many=False, read_only=True
+    )
+    published_chapter = PublishedChapterSerializer(
+        source="publishedchapter", many=False, read_only=True
+    )
+
+    class Meta:
+        model = Production
+        fields = "__all__"

@@ -10,6 +10,7 @@ class Researcher(models.Model):
     institutes = models.ManyToManyField(
         Institute, related_name="researchers", blank=True
     )
+    citation_names = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
