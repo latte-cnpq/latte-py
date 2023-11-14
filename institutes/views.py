@@ -24,6 +24,9 @@ class InstitutesViewSet(viewsets.ModelViewSet):
         if country:
             queryset = queryset.filter(country__icontains=country)
 
+        if not queryset.exists():
+            return Response({"results": []})
+
         # Paginação
         page = self.paginate_queryset(queryset)
         if page is not None:

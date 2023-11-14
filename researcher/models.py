@@ -8,7 +8,7 @@ class Researcher(models.Model):
     researcher_id = models.CharField(max_length=255)
     resume = models.TextField()
     institutes = models.ManyToManyField(
-        Institute, related_name="researchers", blank=True
+        Institute, related_name="institutes", blank=True
     )
     citation_names = models.TextField(null=True, blank=True)
 

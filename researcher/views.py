@@ -31,7 +31,7 @@ class ResearcherViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(institutes__id__in=institutes_ids)
 
         if not queryset.exists():
-            return Response([])
+            return Response({"results": []})
 
         page = self.paginate_queryset(queryset)
         if page is not None:

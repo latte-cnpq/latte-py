@@ -41,8 +41,8 @@ class ProductionViewSet(viewsets.ModelViewSet):
         researcher = request.query_params.get("researcher", None)
         start_year = request.query_params.get("start_year", None)
         end_year = request.query_params.get("end_year", None)
-        institutes = request.query_params.getlist("institutes", [])
-        types = request.query_params.getlist("types", [])
+        institute = request.query_params.get("institute", None)
+        type = request.query_params.get("type", None)
         language = request.query_params.get("language", None)
         dissemination_medium = request.query_params.get("dissemination_medium", None)
 
@@ -52,8 +52,7 @@ class ProductionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(title__icontains=title)
         if researcher:
             queryset = queryset.filter(researcher__name__icontains=researcher)
-        if institutes and not institutes[0] == "":
-            queryset = queryset.filter(researcher__institutes__in=institutes)
+        queryset = queryset.filter(researcher__institutes__acronym__icontains=institute)
         if start_year and end_year:
             try:
                 start_year = int(start_year)
@@ -73,9 +72,8 @@ class ProductionViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(year__lte=end_year)
             except ValueError:
                 raise ValidationError("Invalid end_year format.")
-        if types and not types[0] == "":
-            print(types)
-            queryset = queryset.filter(type__in=types)
+        if type:
+            queryset = queryset.filter(type=type)
         if language:
             queryset = queryset.filter(language__icontains=language)
         if dissemination_medium:
@@ -86,7 +84,7 @@ class ProductionViewSet(viewsets.ModelViewSet):
         print(queryset)
 
         if not queryset.exists():
-            return Response([])
+            return Response({"results": []})
 
         page = self.paginate_queryset(queryset)
         if page is not None:

@@ -4,7 +4,9 @@ from .views import CollaborationGraphViewSet
 
 router = DefaultRouter()
 router.register(
-    "collab_graph", CollaborationGraphViewSet, basename="colaboration_graph"
+    "collab_graph",
+    CollaborationGraphViewSet,
+    basename="colaboration_graph",
 )
 
 urlpatterns = [
