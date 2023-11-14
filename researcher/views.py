@@ -3,11 +3,13 @@ from .serializers import ResearcherSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from utils.pagination import CustomPagination
 
 
 class ResearcherViewSet(viewsets.ModelViewSet):
     queryset = Researcher.objects.all()
     serializer_class = ResearcherSerializer
+    pagination_class = CustomPagination
 
     @action(detail=False, methods=["get"])
     def search(self, request):
@@ -27,6 +29,14 @@ class ResearcherViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(researcher_id__icontains=researcher_id)
         if institutes_ids:
             queryset = queryset.filter(institutes__id__in=institutes_ids)
+
+        if not queryset.exists():
+            return Response([])
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ResearcherSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         # Serializa o resultado e retorna a resposta
         serializer = ResearcherSerializer(queryset, many=True)

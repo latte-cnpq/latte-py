@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("institutes.urls"), name="institutes"),
     path("", include("researcher.urls"), name="researcher"),
     path("", include("productions.urls"), name="productions"),
+    path("", include("data.urls"), name="data"),
     path(
         "docs",
         SpectacularRedocView.as_view(),

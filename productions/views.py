@@ -10,6 +10,8 @@ from .serializers import (
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError
+from utils.pagination import CustomPagination
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -30,14 +32,17 @@ class PublishedChapterViewSet(viewsets.ModelViewSet):
 class ProductionViewSet(viewsets.ModelViewSet):
     queryset = Production.objects.all()
     serializer_class = ProductionSerializer
+    pagination_class = CustomPagination
 
     @action(detail=False, methods=["get"])
     def search(self, request):
         # Recupera os parâmetros da solicitação
         title = request.query_params.get("title", None)
         researcher = request.query_params.get("researcher", None)
-        year = request.query_params.get("year", None)
-        types = request.query_params.getlist("types", None)
+        start_year = request.query_params.get("start_year", None)
+        end_year = request.query_params.get("end_year", None)
+        institutes = request.query_params.getlist("institutes", [])
+        types = request.query_params.getlist("types", [])
         language = request.query_params.get("language", None)
         dissemination_medium = request.query_params.get("dissemination_medium", None)
 
@@ -47,9 +52,29 @@ class ProductionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(title__icontains=title)
         if researcher:
             queryset = queryset.filter(researcher__name__icontains=researcher)
-        if year:
-            queryset = queryset.filter(year=year)
-        if types:
+        if institutes and not institutes[0] == "":
+            queryset = queryset.filter(researcher__institutes__in=institutes)
+        if start_year and end_year:
+            try:
+                start_year = int(start_year)
+                end_year = int(end_year)
+                queryset = queryset.filter(year__range=(start_year, end_year))
+            except ValueError:
+                raise ValidationError("Invalid start_year or end_year format.")
+        elif start_year:
+            try:
+                start_year = int(start_year)
+                queryset = queryset.filter(year__gte=start_year)
+            except ValueError:
+                raise ValidationError("Invalid start_year format.")
+        elif end_year:
+            try:
+                end_year = int(end_year)
+                queryset = queryset.filter(year__lte=end_year)
+            except ValueError:
+                raise ValidationError("Invalid end_year format.")
+        if types and not types[0] == "":
+            print(types)
             queryset = queryset.filter(type__in=types)
         if language:
             queryset = queryset.filter(language__icontains=language)
@@ -58,7 +83,11 @@ class ProductionViewSet(viewsets.ModelViewSet):
                 dissemination_medium__icontains=dissemination_medium
             )
 
-        # Paginação
+        print(queryset)
+
+        if not queryset.exists():
+            return Response([])
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = ProductionSerializer(page, many=True)
